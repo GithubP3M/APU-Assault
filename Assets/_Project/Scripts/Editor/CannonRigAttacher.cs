@@ -36,6 +36,20 @@ namespace APUAssault.Editor
             EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
         }
 
+        [MenuItem("APU Assault/Show Controller Models")]
+        public static void ShowControllerModels()
+        {
+            foreach (var name in new[] { "Left Controller", "Right Controller" })
+            {
+                var controller = GameObject.Find(name);
+                if (controller == null) continue;
+                foreach (var r in controller.GetComponentsInChildren<Renderer>(true))
+                    if (PrefabUtility.IsPartOfPrefabInstance(r))
+                        PrefabUtility.RevertObjectOverride(r, InteractionMode.AutomatedAction);
+            }
+            EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+        }
+
         static void SetupArm(GameObject prefab, Transform mecha, Transform rig, Transform head, string controllerName, MechaCannon.Hand hand, float shoulderX)
         {
             var controller = GameObject.Find(controllerName);
@@ -44,8 +58,6 @@ namespace APUAssault.Editor
                 Debug.LogWarning("APU Assault: '" + controllerName + "' not found in the active scene.");
                 return;
             }
-
-            foreach (var r in controller.GetComponentsInChildren<Renderer>(true)) r.enabled = false;
 
             var cannon = (GameObject)PrefabUtility.InstantiatePrefab(prefab, mecha);
             var cannonComp = cannon.AddComponent<MechaCannon>();
